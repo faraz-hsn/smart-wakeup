@@ -65,9 +65,12 @@ class TimePickerDelegate extends WatchUi.PickerDelegate {
         _onPicked = onPicked;
     }
 
+    // Close the picker FIRST, then report the value: the callback rebuilds the
+    // home menu, and popping afterwards would remove the fresh menu and leave
+    // the stale one (bug seen in the simulator: label kept the old time).
     function onAccept(values as Array) as Boolean {
-        _onPicked.invoke((values[0] as Number) * 60 + (values[1] as Number));
         WatchUi.popView(WatchUi.SLIDE_RIGHT);
+        _onPicked.invoke((values[0] as Number) * 60 + (values[1] as Number));
         return true;
     }
 

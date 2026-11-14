@@ -34,3 +34,5 @@ Small technical choices made inside a layer. Product decisions are in PLAN.md se
 | 28 | E | Defaults for goal mode: 7 h goal, latest wake 10:00; goal clamped to 1–12 h; goal set with the same hour:minute picker | Quick to change in the menu |
 | 29 | E | Both modes share one `WakeDecider` contract; session, log and screens don't care which mode runs | Feature 1 code untouched apart from the shared parent |
 | 30 | E | Goal demo starts the replayed night 5 h before the latest wake time; the demo overrides only tonight's goal, not the saved settings | Your 7 h setting survives a demo |
+| 31 | E | Time picker closes itself before saving the value | Fixes stale menu label after editing a time (seen in simulator) |
+| 32 | E | Demo videos are animated GIFs (no video encoder installed; GIFs play in PowerPoint/Slides without extra software) | Ask if you want MP4 (needs one Python package download) |
