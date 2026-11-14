@@ -21,7 +21,7 @@ class NightSession {
 
     var state as Number = SessionState.IDLE;
     var engine as SleepStateEngine;
-    var decider as SmartWakeDecider or Null = null;
+    var decider as WakeDecider or Null = null;
     var log as NightLog or Null = null;
     var lastSample as MinuteSample or Null = null;
     var minutes as Number = 0;
@@ -47,9 +47,18 @@ class NightSession {
 
     function start() as Void {
         var now = _clock.nowSec();
-        var w = SmartWakeDecider.nextWindow(now, _clock.minuteOfDay(now), _settings);
-        decider = new SmartWakeDecider(w[0], w[1]);
-        log = new NightLog(now, w[0], w[1]);
+        var nowMin = _clock.minuteOfDay(now);
+        if (_settings.mode == WakeMode.GOAL) {
+            var latest = WakeDecider.nextTimeOf(now, nowMin, _settings.latestMin);
+            decider = new QualityGoalDecider(_settings.goalMin, latest);
+            log = new NightLog(now, latest, latest);
+            log.goalMin = _settings.goalMin;
+        } else {
+            var w = SmartWakeDecider.nextWindow(now, nowMin, _settings);
+            decider = new SmartWakeDecider(w[0], w[1]);
+            log = new NightLog(now, w[0], w[1]);
+        }
+        log.mode = _settings.mode;
         state = SessionState.MONITORING;
         _lastMinuteAt = now;
         _source.start(method(:onMinute));
@@ -57,7 +66,7 @@ class NightSession {
             _watchdog = new Timer.Timer();
             _watchdog.start(method(:onWatchdog), WATCHDOG_MS, true);
         }
-        Log.d("Session", "start; window " + w[0] + ".." + w[1]);
+        Log.d("Session", "start; mode " + _settings.mode + " window " + decider.windowStartSec + ".." + decider.windowEndSec);
         changed();
     }
 
@@ -81,7 +90,13 @@ class NightSession {
     }
 
     private function evaluate(minuteEndSec as Number, st as Number) as Void {
-        if (decider.onMinute(minuteEndSec, st)) {
+        var fired = decider.onMinute(minuteEndSec, st);
+        if (decider instanceof QualityGoalDecider) {
+            log.bankedMin = (decider as QualityGoalDecider).bankedMin;
+            log.windowStartSec = decider.windowStartSec;
+            log.windowEndSec = decider.windowEndSec;
+        }
+        if (fired) {
             log.wakeSec = decider.firedAtSec;
             log.reason = decider.reason;
             state = SessionState.ALARMING;

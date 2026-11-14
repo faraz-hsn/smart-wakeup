@@ -35,6 +35,9 @@ class NightLog {
     var states as String = "";
     var wakeSec as Number = 0;
     var reason as Number = WakeReason.NONE;
+    var mode as Number = WakeMode.WINDOW;
+    var goalMin as Number = 0;          // F2 only
+    var bankedMin as Number = 0;        // F2 only: quality minutes banked
 
     function initialize(startSec as Number, ws as Number, we as Number) {
         self.startSec = startSec; windowStartSec = ws; windowEndSec = we;
@@ -51,12 +54,14 @@ class NightLog {
 
     function toDict() as Dictionary {
         return { "st" => startSec, "ws" => windowStartSec, "we" => windowEndSec,
-                 "s" => states, "w" => wakeSec, "r" => reason };
+                 "s" => states, "w" => wakeSec, "r" => reason,
+                 "m" => mode, "g" => goalMin, "b" => bankedMin };
     }
 
     static function fromDict(d as Dictionary) as NightLog {
         var n = new NightLog(d["st"] as Number, d["ws"] as Number, d["we"] as Number);
         n.states = d["s"] as String; n.wakeSec = d["w"] as Number; n.reason = d["r"] as Number;
+        if (d["m"] != null) { n.mode = d["m"] as Number; n.goalMin = d["g"] as Number; n.bankedMin = d["b"] as Number; }
         return n;
     }
 }
