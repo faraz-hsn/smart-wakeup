@@ -1,6 +1,7 @@
 """Turn simulator frames (from scripts/simrec.ps1) into a ~10 s demo GIF.
 
 Usage: python -I tools/make_demo_gif.py <framesDir> <out.gif> "<caption>"
+       python    tools/make_demo_gif.py <framesDir> <out.mp4> "<caption>"   (MP4 needs imageio-ffmpeg)
 
 Phases are detected from the screen itself:
   menu    : before the night screen appears
@@ -74,7 +75,18 @@ for k in ("menu", "night", "alarm", "morning"):
         if k == "night":
             d.rectangle((0, H - 24, W, H), fill=(20, 30, 80))
             d.text((10, H - 22), "Real lab-recorded night, fast-forwarded", fill=(244, 211, 94), font=font)
-        out_frames.append(im.quantize(colors=128))
+        out_frames.append(im if out.lower().endswith(".mp4") else im.quantize(colors=128))
 
-out_frames[0].save(out, save_all=True, append_images=out_frames[1:], duration=int(1000 / FPS), loop=0, optimize=True)
+if out.lower().endswith(".mp4"):
+    # MP4 (H.264, plays in PowerPoint/Keynote/Slides). Needs: pip install --user imageio imageio-ffmpeg
+    # Run this script WITHOUT python -I so the user-installed package is found.
+    import imageio.v2 as imageio
+    import numpy as np
+    with imageio.get_writer(out, fps=FPS, codec="libx264", quality=9,
+                            pixelformat="yuv420p", macro_block_size=2) as wr:
+        for im in out_frames:
+            big = im.convert("RGB").resize((W * 2, H * 2), Image.LANCZOS)
+            wr.append_data(np.asarray(big))
+else:
+    out_frames[0].save(out, save_all=True, append_images=out_frames[1:], duration=int(1000 / FPS), loop=0, optimize=True)
 print("wrote", out, len(out_frames), "frames,", round(len(out_frames) / FPS, 1), "s,", os.path.getsize(out) // 1024, "KB")

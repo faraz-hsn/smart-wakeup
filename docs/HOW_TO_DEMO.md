@@ -54,10 +54,10 @@ Watch buttons in the simulator. **Click the buttons on the watch picture with th
 
 ## 3. Ten-second videos for the slides
 
-Both are animated GIFs, which play automatically in PowerPoint and Google Slides (Insert → Image):
+Each comes as MP4 (H.264, 760×780, 9.8 s; PowerPoint: Insert → Video) and as an animated GIF (Insert → Image):
 
-- `demo/Restwise_Feature1_SmartWindow.gif`: menu → night fast-forward → 6:43 alarm → "why I woke you"
-- `demo/Restwise_Feature2_SleepGoal.gif`: goal mode → bank filling → 8:58 alarm → "Banked 3h 27m of 3h 00m"
+- `demo/Restwise_Feature1_SmartWindow.mp4` / `.gif`: menu → night fast-forward → 6:43 alarm → "why I woke you"
+- `demo/Restwise_Feature2_SleepGoal.mp4` / `.gif`: goal mode → bank filling → 8:58 alarm → "Banked 3h 27m of 3h 00m"
 
 To re-record after changes: `scripts/simrec.ps1` captures frames and `tools/make_demo_gif.py` builds the GIF. The exact commands are at the top of each file.
 
