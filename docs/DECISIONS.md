@@ -14,3 +14,7 @@ Small technical choices made inside a layer. Product decisions are in PLAN.md se
 | 8 | A | SETTLED needs 10+ still minutes, HR ≤ baseline +5%, HR std ≤ 3 bpm; AWAKE if moving with HR +10% or walking, or HR +25% alone | Rules from the report (section 2.0) |
 | 9 | A | HR baseline: resting HR from the user profile, then slow average over still minutes (~30 min memory) | Adapts to each night |
 | 10 | A | Replay data = per-minute rows in a JSON resource (~6 KB for a night) | Raw 50 Hz data (45 MB) would not fit on the watch |
+| 11 | B | In the window, an AWAKE minute also triggers the alarm (reason "already awake") | No point waiting if the user is already up |
+| 12 | B | Wake window computed as absolute times at bedtime: next occurrence of the start time | Handles going to bed before or after midnight |
+| 13 | B | Alarm ramp: pulses every 10 s at 25→50→75→100% strength, tone added after 60 s (your choice), snooze 5 min (your choice) | Report F5 |
+| 14 | B | Night log stored as one character per minute ("0/1/2"), only the last night kept | ~600 bytes per night; history comes with Feature 4 |
