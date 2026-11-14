@@ -63,3 +63,14 @@ function morningTextReasonsAndDurations(logger as Test.Logger) as Boolean {
     Test.assertEqual("5h 07m", WakeText.duration(307));
     return true;
 }
+
+(:test)
+function goalTextsAndSummary(logger as Test.Logger) as Boolean {
+    Test.assertEqual("Banked 3h 12m of 3h 00m", WakeText.banked(192, 180));
+    Test.assertEqual("Latest wake time reached", WakeText.reason(WakeReason.LATEST_TIME));
+    var s = new WakeSettings(390, 420);
+    Test.assertEqual("Wake 6:30-7:00", SetupMenu.summary(s));
+    s.mode = WakeMode.GOAL; s.goalMin = 420; s.latestMin = 600;
+    Test.assertEqual("Goal 7h 00m, by 10:00", SetupMenu.summary(s));
+    return true;
+}

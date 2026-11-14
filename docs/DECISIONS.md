@@ -29,3 +29,8 @@ Small technical choices made inside a layer. Product decisions are in PLAN.md se
 | 23 | D | Demo aligns data minute 225 with the user's window start; after the data ends it pads quiet minutes | Window covers the night's last hour; long windows still reach their end |
 | 24 | D | Your choices: visible "Demo night" menu item, ~45 s night (150 ms/minute), 10 s snooze in demo | Product decisions (asked) |
 | 25 | D | Time picker: 2 columns (hour, ":mm"), blue/grey text, smaller font | 3 columns overflowed the round screen; white text vanished on the white picker background |
+| 26 | E | Your choices: quality = settled + restless; Mode item in home menu; 20-min max wait after goal; demo goal 3 h | Product decisions (asked) |
+| 27 | E | Goal target = goal + 15 min safety margin (report: trackers over-count sleep by ~10–30 min) | Report section 2, F2 |
+| 28 | E | Defaults for goal mode: 7 h goal, latest wake 10:00; goal clamped to 1–12 h; goal set with the same hour:minute picker | Quick to change in the menu |
+| 29 | E | Both modes share one `WakeDecider` contract; session, log and screens don't care which mode runs | Feature 1 code untouched apart from the shared parent |
+| 30 | E | Goal demo starts the replayed night 5 h before the latest wake time; the demo overrides only tonight's goal, not the saved settings | Your 7 h setting survives a demo |

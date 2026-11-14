@@ -27,11 +27,18 @@ class NightView extends WatchUi.View {
         }
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 0.30, Graphics.FONT_NUMBER_MILD, timeText, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(cx, h * 0.50, Graphics.FONT_XTINY, "Wake " + SetupMenu.windowText(c.settings),
+        var ns = c.night != null ? c.night as WakeSettings : c.settings;
+        dc.drawText(cx, h * 0.50, Graphics.FONT_XTINY, SetupMenu.summary(ns),
             Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
         if (s == null) { return; }
-        var status = s.state == SessionState.IN_WINDOW ? "In window - waiting for light sleep" : "Sleep well";
+        var status;
+        if (ns.mode == WakeMode.GOAL && s.log != null) {
+            status = s.state == SessionState.IN_WINDOW ? "Goal banked - waiting for light sleep"
+                : "Banked " + WakeText.duration((s.log as NightLog).bankedMin);
+        } else {
+            status = s.state == SessionState.IN_WINDOW ? "In window - waiting for light sleep" : "Sleep well";
+        }
         dc.drawText(cx, h * 0.60, Graphics.FONT_XTINY, status, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
         // Demo only: live label vs sleep lab

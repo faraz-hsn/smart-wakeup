@@ -23,7 +23,9 @@ class MorningView extends WatchUi.View {
         dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 0.41, Graphics.FONT_XTINY, WakeText.reason(n.reason), j);
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        if (n.wakeSec > 0) {
+        if (n.mode == WakeMode.GOAL) {
+            dc.drawText(cx, h * 0.50, Graphics.FONT_XTINY, WakeText.banked(n.bankedMin, n.goalMin), j);
+        } else if (n.wakeSec > 0) {
             dc.drawText(cx, h * 0.50, Graphics.FONT_XTINY, WakeText.earliness(n.wakeSec, n.windowEndSec), j);
         }
 
