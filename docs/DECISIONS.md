@@ -18,3 +18,6 @@ Small technical choices made inside a layer. Product decisions are in PLAN.md se
 | 12 | B | Wake window computed as absolute times at bedtime: next occurrence of the start time | Handles going to bed before or after midnight |
 | 13 | B | Alarm ramp: pulses every 10 s at 25→50→75→100% strength, tone added after 60 s (your choice), snooze 5 min (your choice) | Report F5 |
 | 14 | B | Night log stored as one character per minute ("0/1/2"), only the last night kept | ~600 bytes per night; history comes with Feature 4 |
+| 15 | C1 | Sensors switch off as soon as the alarm starts | Saves battery; the night's decision is already made |
+| 16 | C1 | Live-mode watchdog: if no minute arrives for 2.5 min, the decider runs on the last known state every minute | An alarm app must still ring at window end if sensors stall |
+| 17 | C1 | Your choices: START = Dismiss, BACK = Snooze; time picker in 5-min steps | Product decisions (asked) |
