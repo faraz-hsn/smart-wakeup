@@ -68,6 +68,7 @@ class NightDelegate extends WatchUi.BehaviorDelegate {
 
     // BACK asks before ending the night (so it isn't ended by accident).
     function onBack() as Boolean {
+        if (getController().session == null) { getController().goHome(); return true; }   // stale screen
         WatchUi.pushView(new WatchUi.Confirmation("Stop tonight?"), new StopConfirmDelegate(), WatchUi.SLIDE_IMMEDIATE);
         return true;
     }

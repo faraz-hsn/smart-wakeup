@@ -73,3 +73,32 @@ function settingsGoalFieldsRoundTripAndOldFormat(logger as Test.Logger) as Boole
     s.setGoal(10); Test.assertEqual(60, s.goalMin);               // clamped to 1 h
     return true;
 }
+
+// Review fix: a sensor stall must not bank invented sleep in goal mode.
+(:test)
+function goalStallDoesNotBankSleep(logger as Test.Logger) as Boolean {
+    var d = new QualityGoalDecider(60, 100 * 60);
+    for (var i = 0; i < 30; i++) { d.onStale((i + 1) * 60, SleepState.SETTLED); }
+    Test.assertEqual(0, d.bankedMin);
+    Test.assert(!d.fired);
+    Test.assert(d.onStale(100 * 60, SleepState.SETTLED));      // only the deadline fires
+    Test.assertEqual(WakeReason.LATEST_TIME, d.reason);
+    return true;
+}
+
+// Review fix: starting inside the window-start minute targets TOMORROW.
+(:test)
+function nextTimeOfSameMinuteMeansTomorrow(logger as Test.Logger) as Boolean {
+    Test.assertEqual(23400 + 1440 * 60, WakeDecider.nextTimeOf(23420, 390, 390));
+    return true;
+}
+
+// Review fix: DST-safe nextLocal lands on the requested local minute.
+(:test)
+function nextLocalLandsOnRequestedLocalMinute(logger as Test.Logger) as Boolean {
+    var c = new FastClock(1700000000);
+    var t = NightSession.nextLocal(c, 1700000000, 390);
+    Test.assertEqual(390, c.minuteOfDay(t));
+    Test.assert(t > 1700000000 && t - 1700000000 <= 1440 * 60);
+    return true;
+}

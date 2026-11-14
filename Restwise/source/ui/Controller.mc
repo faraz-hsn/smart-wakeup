@@ -21,7 +21,7 @@ class RestwiseController {
     // "Go to sleep" from the setup menu.
     function startNight() as Void {
         var clock = new Clock();
-        startWith(new LiveSensorSource(clock), clock, new AlarmDriver(null), settings);
+        startWith(new LiveSensorSource(clock), clock, new AlarmDriver(null), settings, true);
     }
 
     // Demo: replay the real PhysioNet night at high speed (your choices:
@@ -39,19 +39,17 @@ class RestwiseController {
         var rows = data["rows"] as Array;
         var real = new Clock();
         var now = real.nowSec();
-        var nowMin = real.minuteOfDay(now);
         var run = settings.copy();
         var startSec;
         if (run.mode == WakeMode.GOAL) {
             run.goalMin = DEMO_GOAL_MIN;
-            startSec = WakeDecider.nextTimeOf(now, nowMin, run.latestMin) - DEMO_GOAL_LEAD_MIN * 60;
+            startSec = NightSession.nextLocal(real, now, run.latestMin) - DEMO_GOAL_LEAD_MIN * 60;
         } else {
-            var w = SmartWakeDecider.nextWindow(now, nowMin, run);
-            startSec = w[0] - DEMO_ALIGN_MIN * 60;
+            startSec = NightSession.nextLocal(real, now, run.windowStartMin) - DEMO_ALIGN_MIN * 60;
         }
         var clock = new FastClock(startSec);
         startWith(new ReplaySensorSource(rows, startSec, clock, DEMO_MS_PER_MINUTE),
-            clock, new AlarmDriver(DEMO_SNOOZE_MS), run);
+            clock, new AlarmDriver(DEMO_SNOOZE_MS), run, false);
     }
 
     // Shared by live and demo nights.
@@ -59,11 +57,13 @@ class RestwiseController {
     // touching the user's saved settings).
     var night as WakeSettings or Null = null;
 
-    function startWith(source as SensorSource, clock as Clock, alarm as AlarmDriver, runSettings as WakeSettings) as Void {
+    // persist: false for the demo, so it never replaces your real "Last night".
+    function startWith(source as SensorSource, clock as Clock, alarm as AlarmDriver,
+                       runSettings as WakeSettings, persist as Boolean) as Void {
         Store.saveSettings(settings);
         night = runSettings;
         var resting = UserProfile.getProfile().restingHeartRate;
-        session = new NightSession(source, clock, alarm, runSettings, resting, true, method(:onSessionChanged));
+        session = new NightSession(source, clock, alarm, runSettings, resting, persist, method(:onSessionChanged));
         WatchUi.switchToView(new NightView(), new NightDelegate(), WatchUi.SLIDE_LEFT);
         session.start();
     }
@@ -72,13 +72,18 @@ class RestwiseController {
     function onSessionChanged() as Void {
         var s = session;
         if (s == null) { return; }
-        if (s.state == SessionState.ALARMING && !(WatchUi.getCurrentView()[0] instanceof AlarmView)) {
+        var top = WatchUi.getCurrentView()[0];
+        if (s.state == SessionState.ALARMING && !(top instanceof AlarmView)) {
+            // Something may sit on top of the night screen (e.g. a forgotten
+            // "Stop tonight?" dialog). Remove it first so the alarm REPLACES the
+            // night screen instead of stacking above it.
+            if (!(top instanceof NightView)) { WatchUi.popView(WatchUi.SLIDE_IMMEDIATE); }
             WatchUi.switchToView(new AlarmView(), new AlarmDelegate(), WatchUi.SLIDE_UP);
         } else if (s.state == SessionState.DONE) {
             var log = s.log;
             session = null;
             if (log != null && log.reason != WakeReason.NONE) {
-                WatchUi.switchToView(new MorningView(log), new MorningDelegate(), WatchUi.SLIDE_UP);
+                WatchUi.switchToView(new MorningView(log), new MorningDelegate(false), WatchUi.SLIDE_UP);
             } else {
                 var home = homeView();
                 WatchUi.switchToView(home[0], home[1], WatchUi.SLIDE_RIGHT);
@@ -90,7 +95,7 @@ class RestwiseController {
     function showLastNight() as Void {
         var log = Store.loadLastNight();
         if (log != null) {
-            WatchUi.pushView(new MorningView(log), new MorningDelegate(), WatchUi.SLIDE_LEFT);
+            WatchUi.pushView(new MorningView(log), new MorningDelegate(true), WatchUi.SLIDE_LEFT);
         }
     }
 

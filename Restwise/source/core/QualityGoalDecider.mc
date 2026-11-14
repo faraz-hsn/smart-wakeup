@@ -26,6 +26,14 @@ class QualityGoalDecider extends WakeDecider {
 
     function targetMin() as Number { return goalMin + MARGIN_MIN; }
 
+    // Sensors silent: never bank invented sleep. Only the latest-time
+    // deadline can still fire.
+    function onStale(nowSec as Number, lastState as Number) as Boolean {
+        if (fired || nowSec < latestSec) { return false; }
+        fire(nowSec, WakeReason.LATEST_TIME);
+        return true;
+    }
+
     function onMinute(minuteEndSec as Number, state as Number) as Boolean {
         if (fired) { return false; }
         if (state != SleepState.AWAKE) { bankedMin++; }

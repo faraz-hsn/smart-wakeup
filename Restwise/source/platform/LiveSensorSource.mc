@@ -37,14 +37,14 @@ class LiveSensorSource extends SensorSource {
     }
 
     function onSensorInfo(info as Sensor.Info) as Void {
-        _agg.addHeartRate(info.heartRate);
         checkMinute();
+        _agg.addHeartRate(info.heartRate);
     }
 
     function onSensorData(data as Sensor.SensorData) as Void {
+        checkMinute();
         var a = data.accelerometerData;
         if (a != null) { _agg.addAccel(a.x, a.y, a.z); }
-        checkMinute();
     }
 
     // Emit when the wall-clock minute rolls over.

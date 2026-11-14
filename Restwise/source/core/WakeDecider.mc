@@ -31,10 +31,20 @@ class WakeDecider {
 
     function onMinute(minuteEndSec as Number, state as Number) as Boolean { return false; }
 
-    // Next occurrence of a local minute-of-day, as epoch seconds.
+    // Called by the session's watchdog when sensors have been silent. Default:
+    // treat it like a minute with the last known state.
+    function onStale(nowSec as Number, lastState as Number) as Boolean {
+        return onMinute(nowSec, lastState);
+    }
+
+    // Next occurrence of a local minute-of-day, as epoch seconds. "Next" is
+    // strictly in the future: if we are inside that very minute, it means
+    // tomorrow (starting a night at 6:30 must not target 6:30 today).
     static function nextTimeOf(nowSec as Number, nowMinOfDay as Number, minOfDay as Number) as Number {
         var minuteStart = nowSec - (nowSec % 60);
-        return minuteStart + ((minOfDay - nowMinOfDay + 1440) % 1440) * 60;
+        var mins = (minOfDay - nowMinOfDay + 1440) % 1440;
+        if (mins == 0) { mins = 1440; }
+        return minuteStart + mins * 60;
     }
 
     protected function fire(t as Number, r as Number) as Void {

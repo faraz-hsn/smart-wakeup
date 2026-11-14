@@ -55,6 +55,9 @@ class AlarmDriver {
                 new Attention.VibeProfile(level, len)
             ]);
         }
+        if (Attention has :backlight) {
+            try { Attention.backlight(true); } catch (e) { }
+        }
         if (_step >= TONE_AFTER_STEPS && Attention has :playTone) {
             Attention.playTone(Attention.TONE_ALARM);
         }

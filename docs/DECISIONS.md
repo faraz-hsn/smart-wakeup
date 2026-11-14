@@ -36,3 +36,9 @@ Small technical choices made inside a layer. Product decisions are in PLAN.md se
 | 30 | E | Goal demo starts the replayed night 5 h before the latest wake time; the demo overrides only tonight's goal, not the saved settings | Your 7 h setting survives a demo |
 | 31 | E | Time picker closes itself before saving the value | Fixes stale menu label after editing a time (seen in simulator) |
 | 32 | E | Demo videos are animated GIFs (no video encoder installed; GIFs play in PowerPoint/Slides without extra software) | Ask if you want MP4 (needs one Python package download) |
+| 33 | Review | Alarm replaces any dialog left over the night screen; BACK on a stale night screen goes home | Fixes un-exitable app after a forgotten "Stop tonight?" (verified in simulator) |
+| 34 | Review | "Last night" closes back to the existing menu instead of stacking a new one | Fixes view-stack growth |
+| 35 | Review | Wake/latest times computed from the local clock (DST-safe); a start inside the target minute means tomorrow | Fixes 1-hour error on DST nights and 1-minute alarm edge case |
+| 36 | Review | Sensor stall in goal mode never banks sleep; only the latest-time deadline can fire | Fixes early wake on invented sleep |
+| 37 | Review | Demo nights are not saved as "Last night"; backlight turns on with the alarm | Demo never overwrites real data; screen readable when ringing |
+| 38 | Review | Open item: confirm on a real watch that Do Not Disturb / sleep mode doesn't mute Connect IQ vibration and tone | Can't be tested in the simulator |

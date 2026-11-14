@@ -48,8 +48,14 @@ class MorningView extends WatchUi.View {
     }
 }
 
+// pushed = opened from "Last night" on top of the home menu -> just pop back.
+// Otherwise it replaced the alarm screen -> replace it with a fresh home menu.
 class MorningDelegate extends WatchUi.BehaviorDelegate {
-    function initialize() { BehaviorDelegate.initialize(); }
-    function onBack() as Boolean { getController().goHome(); return true; }
-    function onSelect() as Boolean { getController().goHome(); return true; }
+    private var _pushed as Boolean;
+    function initialize(pushed as Boolean) { BehaviorDelegate.initialize(); _pushed = pushed; }
+    function onBack() as Boolean { leave(); return true; }
+    function onSelect() as Boolean { leave(); return true; }
+    private function leave() as Void {
+        if (_pushed) { WatchUi.popView(WatchUi.SLIDE_RIGHT); } else { getController().goHome(); }
+    }
 }

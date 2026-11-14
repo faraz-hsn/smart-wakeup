@@ -47,16 +47,16 @@ class NightSession {
 
     function start() as Void {
         var now = _clock.nowSec();
-        var nowMin = _clock.minuteOfDay(now);
         if (_settings.mode == WakeMode.GOAL) {
-            var latest = WakeDecider.nextTimeOf(now, nowMin, _settings.latestMin);
+            var latest = NightSession.nextLocal(_clock, now, _settings.latestMin);
             decider = new QualityGoalDecider(_settings.goalMin, latest);
             log = new NightLog(now, latest, latest);
             log.goalMin = _settings.goalMin;
         } else {
-            var w = SmartWakeDecider.nextWindow(now, nowMin, _settings);
-            decider = new SmartWakeDecider(w[0], w[1]);
-            log = new NightLog(now, w[0], w[1]);
+            var ws = NightSession.nextLocal(_clock, now, _settings.windowStartMin);
+            var we = ws + (_settings.windowEndMin - _settings.windowStartMin) * 60;
+            decider = new SmartWakeDecider(ws, we);
+            log = new NightLog(now, ws, we);
         }
         log.mode = _settings.mode;
         state = SessionState.MONITORING;
@@ -78,19 +78,30 @@ class NightSession {
         var st = engine.process(s);
         log.addMinute(st);
         _lastMinuteAt = _clock.nowSec();
-        evaluate(s.epochSec + 60, st);
+        evaluate(s.epochSec + 60, st, false);
     }
 
     // Safety net: sensors silent for too long -> decide with what we have.
     function onWatchdog() as Void {
         var now = _clock.nowSec();
         if (now - _lastMinuteAt >= STALE_SEC) {
-            evaluate(now, engine.lastState);
+            evaluate(now, engine.lastState, true);
         }
     }
 
-    private function evaluate(minuteEndSec as Number, st as Number) as Void {
-        var fired = decider.onMinute(minuteEndSec, st);
+    // Next local wall-clock occurrence of minOfDay. Adding minutes to "now"
+    // drifts by an hour on daylight-saving nights, so re-check the local time
+    // of the result and correct the difference.
+    static function nextLocal(clock as Clock, nowSec as Number, minOfDay as Number) as Number {
+        var t = WakeDecider.nextTimeOf(nowSec, clock.minuteOfDay(nowSec), minOfDay);
+        var diff = minOfDay - clock.minuteOfDay(t);
+        if (diff > 720) { diff -= 1440; }
+        if (diff < -720) { diff += 1440; }
+        return t + diff * 60;
+    }
+
+    private function evaluate(minuteEndSec as Number, st as Number, stale as Boolean) as Void {
+        var fired = stale ? decider.onStale(minuteEndSec, st) : decider.onMinute(minuteEndSec, st);
         if (decider instanceof QualityGoalDecider) {
             log.bankedMin = (decider as QualityGoalDecider).bankedMin;
             log.windowStartSec = decider.windowStartSec;
