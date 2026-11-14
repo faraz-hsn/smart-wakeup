@@ -1,0 +1,7 @@
+Garmin-SDK-Manager/
+research_notes/
+Restwise/bin/
+*.prg
+*.prg.debug.xml
+*.der
+*.pem

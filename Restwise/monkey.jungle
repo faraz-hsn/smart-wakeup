@@ -1,0 +1,5 @@
+project.manifest = manifest.xml
+
+# App sources: everything under source/. Unit tests live in test/ and are
+# only compiled into the test build (monkeyc --unit-test), see scripts/test.ps1.
+base.sourcePath = source;test
