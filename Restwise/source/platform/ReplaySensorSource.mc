@@ -37,8 +37,15 @@ class ReplaySensorSource extends SensorSource {
     }
 
     function onTick() as Void {
-        if (_i >= _rows.size()) { stop(); return; }
-        var r = _rows[_i] as Array;
+        var r;
+        if (_i < _rows.size()) {
+            r = _rows[_i] as Array;
+        } else {
+            // Data ran out before the alarm: keep the night going with quiet,
+            // unlabelled minutes so a long window still reaches its end.
+            var last = _rows[_rows.size() - 1] as Array;
+            r = [_i, 1, last[2], 1, -1];
+        }
         _i++;
         var t = _startSec + (r[0] as Number) * 60;
         _clock.setNow(t + 59);   // end of this minute

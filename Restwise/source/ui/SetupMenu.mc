@@ -11,6 +11,7 @@ class SetupMenu extends WatchUi.Menu2 {
         if (hasLastNight) {
             addItem(new WatchUi.MenuItem("Last night", null, :last, {}));
         }
+        addItem(new WatchUi.MenuItem("Demo night", "Real recorded night", :demo, {}));
     }
 
     static function windowText(s as WakeSettings) as String {
@@ -45,6 +46,8 @@ class SetupMenuDelegate extends WatchUi.Menu2InputDelegate {
         } else if (id == :end) {
             WatchUi.pushView(new TimePicker("Wake by", c.settings.windowEndMin),
                 new TimePickerDelegate(method(:onEndPicked)), WatchUi.SLIDE_LEFT);
+        } else if (id == :demo) {
+            c.startDemo();
         } else if (id == :last) {
             c.showLastNight();
         }

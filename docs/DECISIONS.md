@@ -25,3 +25,7 @@ Small technical choices made inside a layer. Product decisions are in PLAN.md se
 | 19 | C | Home = menu: Go to sleep / Wake from / Wake by / Last night (when one exists) | Standard Garmin menu style, 2 presses to start a night |
 | 20 | C | BACK during the night asks "Stop tonight?" before ending | Avoids ending the night by an accidental press |
 | 21 | C | Demo screen extras (our label, lab label, HR) only when the source is a replay | Your choice: dark night screen in real use |
+| 22 | D | Engine: a single minute ≥ 8 mG ("stir", e.g. turning over) breaks stillness → RESTLESS | Real-night check showed lone stirs were missed; sleep/wake agreement unchanged at 90.6% |
+| 23 | D | Demo aligns data minute 225 with the user's window start; after the data ends it pads quiet minutes | Window covers the night's last hour; long windows still reach their end |
+| 24 | D | Your choices: visible "Demo night" menu item, ~45 s night (150 ms/minute), 10 s snooze in demo | Product decisions (asked) |
+| 25 | D | Time picker: 2 columns (hour, ":mm"), blue/grey text, smaller font | 3 columns overflowed the round screen; white text vanished on the white picker background |

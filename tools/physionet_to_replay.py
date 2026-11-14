@@ -57,7 +57,7 @@ hist = [0.0] * 5; still = 0; asleep = False; base = None; ours = []
 for m, act, hm, hs, lab in rows:
     hist = hist[1:] + [act]
     d = P * sum(w * a for w, a in zip(W, hist)); moving = d >= 1
-    still = 0 if moving else still + 1
+    still = 0 if (moving or act >= 8) else still + 1
     if not asleep and still >= 10: asleep = True
     h = None if hm < 0 else hm
     if h is not None and not moving:

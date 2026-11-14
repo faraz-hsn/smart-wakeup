@@ -99,3 +99,12 @@ function engineNeedsStillnessToResettle(logger as Test.Logger) as Boolean {
     Test.assertEqual(SleepState.RESTLESS, s);                   // only 5 still minutes
     return true;
 }
+
+(:test)
+function engineSmallStirBreaksSettled(logger as Test.Logger) as Boolean {
+    var e = new SleepStateEngine(60);
+    rwFeed(e, 25, 1.0, 58.0);                                   // settled
+    var s = e.process(rwSample(30, 12.0, 58.0));                // turning over: 12 mG
+    Test.assertEqual(SleepState.RESTLESS, s);
+    return true;
+}

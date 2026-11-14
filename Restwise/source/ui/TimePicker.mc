@@ -8,6 +8,7 @@ class StepFactory extends WatchUi.PickerFactory {
     private var _step as Number;
     private var _limit as Number;
     private var _fmt as String;
+    var prefix as String = "";          // e.g. ":" in front of minutes
 
     function initialize(start as Number, limit as Number, step as Number, fmt as String) {
         PickerFactory.initialize();
@@ -23,34 +24,34 @@ class StepFactory extends WatchUi.PickerFactory {
         return i < 0 ? 0 : (i >= getSize() ? getSize() - 1 : i);
     }
 
+    // Blue/grey read on both the simulator's white picker and a black one.
     function getDrawable(index as Number, selected as Boolean) as WatchUi.Drawable or Null {
         return new WatchUi.Text({
-            :text => (getValue(index) as Number).format(_fmt),
-            :color => selected ? Graphics.COLOR_WHITE : Graphics.COLOR_LT_GRAY,
-            :font => Graphics.FONT_NUMBER_MEDIUM,
+            :text => prefix + (getValue(index) as Number).format(_fmt),
+            :color => selected ? Graphics.COLOR_BLUE : Graphics.COLOR_DK_GRAY,
+            :font => Graphics.FONT_NUMBER_MILD,
             :locX => WatchUi.LAYOUT_HALIGN_CENTER,
             :locY => WatchUi.LAYOUT_VALIGN_CENTER
         });
     }
 }
 
-// Hour : minute picker (minutes in 5-minute steps, your choice).
+// Hour and minute picker (minutes in 5-minute steps, your choice).
+// Two columns fit the round screen; the colon is part of the minute text.
 class TimePicker extends WatchUi.Picker {
     static const MINUTE_STEP = 5;
 
     function initialize(title as String, minOfDay as Number) {
         var hours = new StepFactory(0, 24, 1, "%d");
         var mins = new StepFactory(0, 60, MINUTE_STEP, "%02d");
-        var colon = new WatchUi.Text({ :text => ":", :font => Graphics.FONT_NUMBER_MEDIUM,
-            :locX => WatchUi.LAYOUT_HALIGN_CENTER, :locY => WatchUi.LAYOUT_VALIGN_CENTER,
-            :color => Graphics.COLOR_WHITE });
+        mins.prefix = ":";
         var titleText = new WatchUi.Text({ :text => title, :font => Graphics.FONT_SMALL,
             :locX => WatchUi.LAYOUT_HALIGN_CENTER, :locY => WatchUi.LAYOUT_VALIGN_BOTTOM,
-            :color => Graphics.COLOR_WHITE });
+            :color => Graphics.COLOR_BLUE });
         Picker.initialize({
             :title => titleText,
-            :pattern => [hours, colon, mins],
-            :defaults => [hours.indexOf(minOfDay / 60), 0, mins.indexOf(minOfDay % 60)]
+            :pattern => [hours, mins],
+            :defaults => [hours.indexOf(minOfDay / 60), mins.indexOf(minOfDay % 60)]
         });
     }
 }
@@ -65,7 +66,7 @@ class TimePickerDelegate extends WatchUi.PickerDelegate {
     }
 
     function onAccept(values as Array) as Boolean {
-        _onPicked.invoke((values[0] as Number) * 60 + (values[2] as Number));
+        _onPicked.invoke((values[0] as Number) * 60 + (values[1] as Number));
         WatchUi.popView(WatchUi.SLIDE_RIGHT);
         return true;
     }

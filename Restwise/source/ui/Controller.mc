@@ -24,6 +24,25 @@ class RestwiseController {
         startWith(new LiveSensorSource(clock), clock, new AlarmDriver(null));
     }
 
+    // Demo: replay the real PhysioNet night at high speed (your choices:
+    // ~45 s per night, 10 s snooze). Data minute DEMO_ALIGN_MIN is placed at the
+    // start of the user's wake window, so the window covers the night's last hour.
+    static const DEMO_ALIGN_MIN = 225;
+    static const DEMO_MS_PER_MINUTE = 150;      // 284 min x 150 ms = ~43 s
+    static const DEMO_SNOOZE_MS = 10000;
+
+    function startDemo() as Void {
+        var data = WatchUi.loadResource(Rez.JsonData.DemoNight) as Dictionary;
+        var rows = data["rows"] as Array;
+        var real = new Clock();
+        var now = real.nowSec();
+        var w = SmartWakeDecider.nextWindow(now, real.minuteOfDay(now), settings);
+        var startSec = w[0] - DEMO_ALIGN_MIN * 60;
+        var clock = new FastClock(startSec);
+        startWith(new ReplaySensorSource(rows, startSec, clock, DEMO_MS_PER_MINUTE),
+            clock, new AlarmDriver(DEMO_SNOOZE_MS));
+    }
+
     // Shared by live and demo nights.
     function startWith(source as SensorSource, clock as Clock, alarm as AlarmDriver) as Void {
         Store.saveSettings(settings);

@@ -25,6 +25,7 @@ class SleepStateEngine {
     static const SETTLED_STILL_MIN = 10;
     static const WALK_MG = 100.0;
     static const STEADY_HR_STD = 3.0;
+    static const STIR_MG = 8.0;          // a single small movement (turning over)
 
     private var _hist as Array<Float> = [0.0, 0.0, 0.0, 0.0, 0.0];
     private var _stillRun as Number = 0;
@@ -51,7 +52,9 @@ class SleepStateEngine {
         lastD = d.toFloat();
         var moving = d >= 1.0;
 
-        _stillRun = moving ? 0 : _stillRun + 1;
+        // A stir (below "awake-like" movement) still breaks stillness -> RESTLESS.
+        var stir = s.activity >= STIR_MG;
+        _stillRun = (moving || stir) ? 0 : _stillRun + 1;
         if (!_asleep && _stillRun >= ONSET_STILL_MIN) { _asleep = true; }
 
         var hr = s.hrMean;
