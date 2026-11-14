@@ -5,3 +5,4 @@ Restwise/bin/
 *.prg.debug.xml
 *.der
 *.pem
+tools/data/
