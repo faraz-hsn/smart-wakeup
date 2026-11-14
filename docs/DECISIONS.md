@@ -21,3 +21,7 @@ Small technical choices made inside a layer. Product decisions are in PLAN.md se
 | 15 | C1 | Sensors switch off as soon as the alarm starts | Saves battery; the night's decision is already made |
 | 16 | C1 | Live-mode watchdog: if no minute arrives for 2.5 min, the decider runs on the last known state every minute | An alarm app must still ring at window end if sensors stall |
 | 17 | C1 | Your choices: START = Dismiss, BACK = Snooze; time picker in 5-min steps | Product decisions (asked) |
+| 18 | C | Window edit rules: start moved past end → end = start + 30 min; end moved before start → start = end − 30 min; minimum window 10 min | Never lets the user save an impossible window |
+| 19 | C | Home = menu: Go to sleep / Wake from / Wake by / Last night (when one exists) | Standard Garmin menu style, 2 presses to start a night |
+| 20 | C | BACK during the night asks "Stop tonight?" before ending | Avoids ending the night by an accidental press |
+| 21 | C | Demo screen extras (our label, lab label, HR) only when the source is a replay | Your choice: dark night screen in real use |

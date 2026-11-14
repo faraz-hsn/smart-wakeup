@@ -17,6 +17,31 @@ class WakeSettings {
             && windowStartMin < windowEndMin;
     }
 
+    static const MIN_WINDOW = 10;       // minutes
+    static const DEFAULT_WINDOW = 30;   // used when an edit makes the window invalid
+
+    // Edit the start; if it is now at/after the end, push the end 30 min later.
+    function setStart(m as Number) as Void {
+        windowStartMin = clampDay(m);
+        if (windowEndMin - windowStartMin < MIN_WINDOW) {
+            windowEndMin = clampDay(windowStartMin + DEFAULT_WINDOW);
+            if (windowEndMin - windowStartMin < MIN_WINDOW) { windowStartMin = windowEndMin - DEFAULT_WINDOW; }
+        }
+    }
+
+    // Edit the end; if it is now at/before the start, pull the start 30 min earlier.
+    function setEnd(m as Number) as Void {
+        windowEndMin = clampDay(m);
+        if (windowEndMin - windowStartMin < MIN_WINDOW) {
+            windowStartMin = windowEndMin - DEFAULT_WINDOW;
+            if (windowStartMin < 0) { windowStartMin = 0; windowEndMin = DEFAULT_WINDOW; }
+        }
+    }
+
+    private function clampDay(m as Number) as Number {
+        return m < 0 ? 0 : (m > 1440 ? 1440 : m);
+    }
+
     function toDict() as Dictionary {
         return { "s" => windowStartMin, "e" => windowEndMin };
     }

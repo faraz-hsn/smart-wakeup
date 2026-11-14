@@ -2,15 +2,16 @@ import Toybox.Application;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-// Entry point. Owns nothing but wiring: it creates the first screen.
-// Later steps add the NightSession here.
+// Entry point. Creates the controller and shows the home (setup) menu.
 class RestwiseApp extends Application.AppBase {
+    var controller as RestwiseController or Null = null;
 
     function initialize() {
         AppBase.initialize();
     }
 
     function getInitialView() as [WatchUi.Views] or [WatchUi.Views, WatchUi.InputDelegates] {
-        return [new PlaceholderView()];
+        controller = new RestwiseController();
+        return controller.homeView();
     }
 }
